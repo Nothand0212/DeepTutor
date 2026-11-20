@@ -1343,6 +1343,30 @@ def test_list_files_returns_nested_tree(monkeypatch, tmp_path: Path) -> None:
     assert entries["root.txt"]["type"] == "file"
 
 
+def test_list_files_exposes_zhilu_title_without_changing_file_identity(monkeypatch, tmp_path: Path) -> None:
+    manager = _ready_kb_manager(tmp_path)
+    raw = manager.base_dir / "kb" / "raw"
+    raw.mkdir(parents=True, exist_ok=True)
+    source = "source-" + "a" * 20 + ".md"
+    wiki = "wiki-" + "b" * 20 + ".md"
+    body = "# IMU 单位与换算\n\ndoc_id: source-" + "a" * 20 + "\n"
+    (raw / source).write_text(body, encoding="utf-8")
+    (raw / wiki).write_text("# 导航 Wiki\n\n正文", encoding="utf-8")
+    (raw / "ordinary.md").write_text("# Ordinary heading\n", encoding="utf-8")
+    (raw / ("source-" + "c" * 20 + ".md")).write_bytes(b"\xff\xfe")
+    monkeypatch.setattr(knowledge_router_module, "get_kb_manager", lambda: manager)
+
+    with TestClient(_build_app()) as client:
+        entries = {e["name"]: e for e in client.get("/api/knowledge-bases/kb/files").json()["files"]}
+        assert entries[source]["display_name"] == "IMU 单位与换算"
+        assert entries[wiki]["display_name"] == "导航 Wiki"
+        assert "display_name" not in entries["ordinary.md"]
+        assert "display_name" not in entries["source-" + "c" * 20 + ".md"]
+        response = client.get("/api/knowledge-bases/kb/files/" + source)
+        assert response.status_code == 200
+        assert response.text == body
+
+
 def test_remote_kb_file_listing_is_empty_without_creating_local_storage(
     monkeypatch, tmp_path: Path
 ) -> None:

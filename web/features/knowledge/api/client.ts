@@ -219,6 +219,8 @@ export interface KnowledgeUploadPolicy {
 export interface KnowledgeBaseFile {
   /** POSIX path relative to the KB's raw/ root (may include folders). */
   name: string;
+  /** Published title for display; name remains the file identity. */
+  display_name?: string;
   /** "folder" entries are organizational only; default "file". */
   type?: "file" | "folder";
   size?: number;

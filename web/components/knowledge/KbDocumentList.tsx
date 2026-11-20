@@ -243,23 +243,24 @@ export default function KbDocumentList({
             const Icon = spec.Icon;
             const active = selectedFile === file.name;
             return (
-              <button
-                key={file.name}
-                type="button"
-                onClick={() => onSelect(file)}
+              <Tooltip key={file.name} label={file.display_name || file.name} side="right">
+                <button
+                  type="button"
+                  onClick={() => onSelect(file)}
 
-                aria-label={file.name}
-                className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
-                  active
-                    ? "bg-[var(--primary)]/12 ring-1 ring-[var(--primary)]/40"
-                    : "hover:bg-[var(--muted)]/60"
-                }`}
-              >
-                {active && (
-                  <span className="absolute -left-1 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-[var(--primary)]" />
-                )}
-                <Icon size={13} strokeWidth={1.6} className={spec.tint} />
-              </button>
+                  aria-label={file.display_name || file.name}
+                  className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
+                    active
+                      ? "bg-[var(--primary)]/12 ring-1 ring-[var(--primary)]/40"
+                      : "hover:bg-[var(--muted)]/60"
+                  }`}
+                >
+                  {active && (
+                    <span className="absolute -left-1 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-[var(--primary)]" />
+                  )}
+                  <Icon size={13} strokeWidth={1.6} className={spec.tint} />
+                </button>
+              </Tooltip>
             );
           })}
         </div>
@@ -337,27 +338,29 @@ export default function KbDocumentList({
               : "hover:bg-[var(--muted)]/50"
           } ${dragPath === node.path ? "opacity-50" : ""}`}
         >
-          <button
-            type="button"
-            onClick={() => onSelect(file)}
-            aria-label={node.path}
-            className="flex min-w-0 flex-1 items-center gap-2 text-left"
-          >
-            <Icon
-              size={13}
-              strokeWidth={1.6}
-              className={`shrink-0 ${spec.tint}`}
-            />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[12px] font-medium text-[var(--foreground)]">
-                {node.name}
+          <Tooltip label={file.display_name || node.name} className="min-w-0 flex-1" side="right">
+            <button
+              type="button"
+              onClick={() => onSelect(file)}
+              aria-label={file.display_name || node.path}
+              className="flex w-full min-w-0 items-center gap-2 text-left"
+            >
+              <Icon
+                size={13}
+                strokeWidth={1.6}
+                className={`shrink-0 ${spec.tint}`}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[12px] font-medium text-[var(--foreground)]">
+                  {file.display_name || node.name}
+                </div>
+                <div className="truncate text-[10px] text-[var(--muted-foreground)]">
+                  {file.size ? formatBytes(file.size) : ""}
+                  {file.modified ? ` · ${formatRelative(file.modified)}` : ""}
+                </div>
               </div>
-              <div className="truncate text-[10px] text-[var(--muted-foreground)]">
-                {file.size ? formatBytes(file.size) : ""}
-                {file.modified ? ` · ${formatRelative(file.modified)}` : ""}
-              </div>
-            </div>
-          </button>
+            </button>
+          </Tooltip>
           {confirmDeleteFor === node.path ? (
             <div className="flex shrink-0 items-center gap-0.5 pr-0.5">
               <span className="px-0.5 text-[10px] font-medium text-red-600 dark:text-red-400">

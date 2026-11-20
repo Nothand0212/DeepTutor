@@ -3110,6 +3110,17 @@ async def list_kb_raw_files(kb_name: str):
         except OSError:
             continue
         media_type, _ = mimetypes.guess_type(entry.name)
+        display = {}
+        # Zhilu projections keep stable filenames; their first heading carries the published title.
+        if re.fullmatch(r"(?:source|wiki)-[a-f0-9]{20}\.md", entry.name):
+            try:
+                path = _resolve_raw_file_or_404(raw_dir, rel)
+                with path.open(encoding="utf-8") as handle:
+                    heading = handle.readline(4096)
+                if heading.startswith("# ") and heading.endswith("\n") and heading[2:].strip():
+                    display["display_name"] = heading[2:].strip()
+            except (OSError, UnicodeError, HTTPException):
+                pass
         files.append(
             {
                 "name": rel,
@@ -3117,6 +3128,7 @@ async def list_kb_raw_files(kb_name: str):
                 "size": stat.st_size,
                 "modified": stat.st_mtime,
                 "mime_type": media_type,
+                **display,
             }
         )
     return {"files": files}

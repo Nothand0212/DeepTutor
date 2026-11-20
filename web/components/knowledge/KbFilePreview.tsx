@@ -85,6 +85,7 @@ const FallbackPreview = dynamic(
 
 interface KbFilePreviewProps {
   source: FilePreviewSource | null;
+  displayName?: string;
   /**
    * Optional slot rendered to the right of the breadcrumb / title — used
    * to surface metadata (e.g. file count, modified date) inline in the
@@ -111,6 +112,7 @@ interface KbFilePreviewProps {
  */
 export default function KbFilePreview({
   source,
+  displayName,
   metaSuffix,
   fileListCollapsed,
   onToggleFileList,
@@ -238,8 +240,8 @@ export default function KbFilePreview({
           <HeaderIcon size={15} strokeWidth={1.6} className={spec.tint} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[12.5px] font-medium text-[var(--foreground)]">
-            {source.filename}
+          <div title={displayName || source.filename} className="truncate text-[12.5px] font-medium text-[var(--foreground)]">
+            {displayName || source.filename}
           </div>
           <div className="truncate text-[10.5px] uppercase tracking-wide text-[var(--muted-foreground)]">
             {sizeLabel ? `${spec.label} · ${sizeLabel}` : spec.label}

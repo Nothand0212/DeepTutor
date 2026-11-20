@@ -73,6 +73,7 @@ export default function KbFilesTab({ kb, task }: KbFilesTabProps) {
         {selectedFile && <KbVisualCoverage key={`${kbRef}/${selectedFile.name}`} kbName={kbRef} sourcePath={selectedFile.name} revision={refreshKey} />}
         <KbFilePreview
           source={previewSource}
+          displayName={selectedFile?.display_name}
           fileListCollapsed={fileListPanel.collapsed}
           onToggleFileList={fileListPanel.toggle}
         />
